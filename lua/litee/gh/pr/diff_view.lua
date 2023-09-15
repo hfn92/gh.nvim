@@ -412,19 +412,20 @@ function M.open_diffsplit(commit, file, thread, compare_base)
         LEFT = {}
     }
 
+    local tmp_dir = config.config.temp_dir
     -- this will be the left side of our diff, we'll create this as a tmp file
     -- with the gitcli command
-    local diff_file = string.format("/tmp/%s", lib_util_path.basename(file["filename"]))
+    local diff_file = string.format("%s/%s", tmp_dir, lib_util_path.basename(file["filename"]))
 
-    vim.fn.delete("/tmp/gh-nvim-empty")
+    vim.fn.delete(tmp_dir .. "/gh-nvim-empty")
     -- if the file is added, open our local file and diff an empty buffer
     if file["status"] == "added" then
         vim.cmd("edit " .. file["filename"])
-        diff_file = "/tmp/gh-nvim-empty"
+        diff_file = tmp_dir .. "gh-nvim-empty"
     -- if the file is removed, open an empty buffer first and diff the old
     -- old version
     elseif file["status"] == "removed" then
-        vim.cmd("edit /tmp/gh-nvim-empty")
+        vim.cmd("edit " .. tmp_dir .. "/gh-nvim-empty")
     -- in all other cases open our local file and diff the old version.
     else
         vim.cmd("edit " .. file["filename"])

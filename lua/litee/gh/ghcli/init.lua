@@ -383,7 +383,15 @@ function M.get_pull_issue_comments_async_paginated(pull_number, on_read)
 end
 
 function M.create_pull_issue_comment(number, body)
-    local cmd = string.format([[gh api -X POST /repos/{owner}/{repo}/issues/%d/comments -f body=%s]], number, body)
+    local cmd = {
+      "gh",
+      "api",
+      "-X",
+      "POST",
+      string.format([[/repos/{owner}/{repo}/issues/%s/comments]], number),
+      "-f",
+      string.format([[body=%s]], body:sub(2, #body - 1)),
+    }
     return gh_exec(cmd)
 end
 
@@ -538,15 +546,28 @@ function M.unresolve_thread(thread_id)
 end
 
 function M.create_comment(pull_number, commit_sha, path, position, side, line, body)
-    local cmd = string.format([[gh api --method POST -H "Accept: application/vnd.github.v3+json" /repos/{owner}/{repo}/pulls/%d/comments -f commit_id=%s -f path=%s -f side=%s -F position=%d -F line=%d -f body=%s]],
-        pull_number,
-        commit_sha,
-        path,
-        side,
-        position,
-        line,
-        body
-    )
+    local cmd = {
+      "gh",
+      "api",
+      "-X",
+      "POST",
+      "-H",
+      "Accept: application/vnd.github.v3+json",
+      string.format([[/repos/{owner}/{repo}/pulls/%d/comments]], pull_number),
+      "-f",
+      "commit_id=" .. commit_sha,
+      "-f",
+      "path=" .. path,
+      "-f",
+      "side=" .. side,
+      "-F",
+      "position=" .. position,
+      "-F",
+      "line=" .. line,
+      "-f",
+      string.format([[body=%s]], body:sub(2, #body - 1)),
+    }
+
     local out = gh_exec(cmd)
     if out == nil then
         return nil

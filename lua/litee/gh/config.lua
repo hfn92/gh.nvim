@@ -63,6 +63,8 @@ M.config = {
         -- toggle unread items
         toggle_unread = "u"
     },
+
+    temp_dir = "/tmp",
 }
 
 M.icon_set = nil
